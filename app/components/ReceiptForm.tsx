@@ -38,106 +38,146 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-4">
-        {fields.map((field, index) => (
-          <Card key={field.id} className="p-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor={`domains.${index}.name`}>Domain Name</Label>
-                <Input
-                  {...form.register(`domains.${index}.name`)}
-                  placeholder="example.com"
-                />
+    <div className="window">
+      <div className="title-bar">
+        <div className="title-bar-text">Domain Receipt Generator</div>
+        <div className="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div className="window-body">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            {fields.map((field, index) => (
+              <div key={field.id} className="field-row-stacked">
+                <div className="field-row">
+                  <Label htmlFor={`domains.${index}.name`}>Domain Name</Label>
+                  <Input
+                    {...form.register(`domains.${index}.name`)}
+                    placeholder="example.com"
+                    className="w-full"
+                  />
+                </div>
                 {form.formState.errors.domains?.[index]?.name && (
                   <p className="text-sm text-red-500">
                     {form.formState.errors.domains[index]?.name?.message}
                   </p>
                 )}
-              </div>
 
-              <div className="grid gap-2">
-                <Label>Registration Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'justify-start text-left font-normal',
-                        !form.getValues(`domains.${index}.registrationDate`) &&
-                          'text-muted-foreground'
-                      )}
+                <div className="field-row">
+                  <Label>Registration Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="button" type="button">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {form.getValues(`domains.${index}.registrationDate`) ? (
+                          format(
+                            form.getValues(`domains.${index}.registrationDate`),
+                            'PPP'
+                          )
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                      className="window" 
+                      align="start"
+                      style={{ 
+                        background: '#c0c0c0',
+                        border: '2px outset #fff',
+                        padding: '4px',
+                        width: 'min(100vw - 32px, 300px)',
+                        position: 'relative',
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                      }}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {form.getValues(`domains.${index}.registrationDate`) ? (
-                        format(
-                          form.getValues(`domains.${index}.registrationDate`),
-                          'PPP'
-                        )
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={form.getValues(`domains.${index}.registrationDate`)}
-                      onSelect={(date) => handleDateChange(date, index)}
-                      initialFocus
-                      disabled={(date) => date > new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <Calendar
+                        mode="single"
+                        selected={form.getValues(`domains.${index}.registrationDate`)}
+                        onSelect={(date) => {
+                          if (date) {
+                            handleDateChange(date, index);
+                            form.setValue(`domains.${index}.registrationDate`, date, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                              shouldTouch: true,
+                            });
+                          }
+                        }}
+                        initialFocus
+                        disabled={(date) => date > new Date()}
+                        className="w-full"
+                        classNames={{
+                          months: "flex flex-col space-y-4",
+                          month: "space-y-4",
+                          caption: "flex justify-center pt-1 relative items-center",
+                          caption_label: "text-sm font-bold",
+                          nav: "space-x-1 flex items-center",
+                          nav_button: "button h-7 w-7 bg-transparent p-0",
+                          nav_button_previous: "absolute left-1",
+                          nav_button_next: "absolute right-1",
+                          table: "w-full border-collapse space-y-1",
+                          head_row: "flex",
+                          head_cell: "text-black w-9 font-normal text-[0.8rem]",
+                          row: "flex w-full mt-2",
+                          cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                          day: "button h-8 w-8 p-0 font-normal aria-selected:opacity-100",
+                          day_selected: "bg-[#000080] text-white hover:bg-[#000080] hover:text-white focus:bg-[#000080] focus:text-white",
+                          day_today: "bg-accent text-accent-foreground",
+                          day_outside: "opacity-50",
+                          day_disabled: "opacity-50",
+                          day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                          day_hidden: "invisible",
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {fields.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="button"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Remove Domain
+                  </button>
+                )}
               </div>
-
-              {fields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => remove(index)}
-                  className="w-full"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Remove Domain
-                </Button>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        <div className="grid gap-2">
-          <Label htmlFor="twitterHandle">Twitter Handle (optional)</Label>
-          <div className="relative">
-            <Twitter className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-            <Input
-              {...form.register('twitterHandle')}
-              placeholder="username"
-              className="pl-10"
-            />
+            ))}
           </div>
-        </div>
 
-        <div className="flex gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() =>
-              append({ name: '', registrationDate: new Date() })
-            }
-            className="w-full"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Another Domain
-          </Button>
-          <Button type="submit" className="w-full">
-            Generate Receipt
-          </Button>
-        </div>
+          <div className="field-row-stacked">
+            <Label htmlFor="twitterHandle">Twitter Handle (optional)</Label>
+            <div className="field-row">
+              <Twitter className="h-5 w-5" />
+              <Input
+                {...form.register('twitterHandle')}
+                placeholder="username"
+              />
+            </div>
+          </div>
+
+          <div className="field-row">
+            <button
+              type="button"
+              onClick={() => append({ name: '', registrationDate: new Date() })}
+              className="button"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Another Domain
+            </button>
+            <button type="submit" className="button">
+              Generate Receipt
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 }
