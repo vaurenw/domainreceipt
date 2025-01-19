@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { ReceiptFormData, receiptFormSchema } from '../types/receipt';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 interface ReceiptFormProps {
   onSubmit: (data: ReceiptFormData) => void;
@@ -22,7 +21,7 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
   const form = useForm<ReceiptFormData>({
     resolver: zodResolver(receiptFormSchema),
     defaultValues: {
-      domains: [{ name: '', registrationDate: new Date(), notes: '' }],
+      domains: [{ name: '', registrationDate: new Date() }],
       twitterHandle: '',
     },
   });
@@ -31,6 +30,12 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
     control: form.control,
     name: 'domains',
   });
+
+  const handleDateChange = (date: Date | undefined, index: number) => {
+    if (date && date <= new Date()) {
+      form.setValue(`domains.${index}.registrationDate`, date);
+    }
+  };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -77,24 +82,13 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={form.getValues(
-                        `domains.${index}.registrationDate`
-                      )}
-                      onSelect={(date) =>
-                        form.setValue(`domains.${index}.registrationDate`, date!)
-                      }
+                      selected={form.getValues(`domains.${index}.registrationDate`)}
+                      onSelect={(date) => handleDateChange(date, index)}
                       initialFocus
+                      disabled={(date) => date > new Date()}
                     />
                   </PopoverContent>
                 </Popover>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor={`domains.${index}.notes`}>Notes</Label>
-                <Textarea
-                  {...form.register(`domains.${index}.notes`)}
-                  placeholder="Add any notes about this domain..."
-                />
               </div>
 
               {fields.length > 1 && (
@@ -132,7 +126,7 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
             type="button"
             variant="outline"
             onClick={() =>
-              append({ name: '', registrationDate: new Date(), notes: '' })
+              append({ name: '', registrationDate: new Date() })
             }
             className="w-full"
           >
