@@ -2,15 +2,9 @@
 
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon, Plus, Trash2, Twitter } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Plus, Trash2, Twitter } from 'lucide-react';
 import { ReceiptFormData, receiptFormSchema } from '../types/receipt';
-import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
 interface ReceiptFormProps {
@@ -30,12 +24,6 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
     control: form.control,
     name: 'domains',
   });
-
-  const handleDateChange = (date: Date | undefined, index: number) => {
-    if (date && date <= new Date()) {
-      form.setValue(`domains.${index}.registrationDate`, date);
-    }
-  };
 
   return (
     <div className="window w-full max-w-[95vw] md:max-w-[600px] mx-auto">
@@ -66,47 +54,6 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
                   </p>
                 )}
 
-                <div className="field-row flex-col md:flex-row gap-2">
-                  <Label className="min-w-[100px]">Registration Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className="button w-full md:w-auto" type="button">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {form.getValues(`domains.${index}.registrationDate`) ? (
-                          format(
-                            form.getValues(`domains.${index}.registrationDate`),
-                            'PPP'
-                          )
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent 
-                      className="window" 
-                      align="start"
-                      style={{ 
-                        background: '#c0c0c0',
-                        border: '2px outset #fff',
-                        padding: '4px',
-                        width: 'min(100vw - 32px, 300px)',
-                        position: 'relative',
-                        left: '50%',
-                        transform: 'translateX(-50%)'
-                      }}
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={form.getValues(`domains.${index}.registrationDate`)}
-                        onSelect={(date) => handleDateChange(date!, index)}
-                        initialFocus
-                        disabled={(date) => date > new Date()}
-                        className="w-full"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
                 {fields.length > 1 && (
                   <button
                     type="button"
@@ -136,7 +83,10 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
           <div className="field-row flex-col md:flex-row gap-2">
             <button
               type="button"
-              onClick={() => append({ name: '', registrationDate: new Date() })}
+              onClick={() => append({ 
+                name: '', 
+                registrationDate: new Date() 
+              })}
               className="button w-full md:w-auto"
             >
               <Plus className="mr-2 h-4 w-4" />

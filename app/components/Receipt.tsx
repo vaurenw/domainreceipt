@@ -19,7 +19,6 @@ export function Receipt({ receipt, baseUrl }: ReceiptProps) {
   const downloadReceipt = async () => {
     if (receiptRef.current) {
       try {
-        // Wait for any animations to complete
         await new Promise(resolve => setTimeout(resolve, 500));
         
         const dataUrl = await htmlToImage.toPng(receiptRef.current, {
@@ -72,10 +71,6 @@ export function Receipt({ receipt, baseUrl }: ReceiptProps) {
                   <div className="flex flex-col md:flex-row md:justify-between text-xs md:text-sm">
                     <span className="font-bold">DOMAIN NAME:</span>
                     <span className="break-all">{domain.name}</span>
-                  </div>
-                  <div className="flex flex-col md:flex-row md:justify-between text-xs md:text-sm">
-                    <span className="font-bold">REGISTERED:</span>
-                    <span>{format(domain.registrationDate, 'MM/dd/yyyy')}</span>
                   </div>
                   {index < receipt.domains.length - 1 && (
                     <div className="border-b border-gray-300 border-dotted my-3 md:my-4"></div>
