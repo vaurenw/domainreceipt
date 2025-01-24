@@ -38,7 +38,7 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
   };
 
   return (
-    <div className="window">
+    <div className="window w-full max-w-[95vw] md:max-w-[600px] mx-auto">
       <div className="title-bar">
         <div className="title-bar-text">Domain Receipt Generator</div>
         <div className="title-bar-controls">
@@ -47,13 +47,13 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
           <button aria-label="Close"></button>
         </div>
       </div>
-      <div className="window-body">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div className="window-body p-2 md:p-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
           <div className="space-y-4">
             {fields.map((field, index) => (
               <div key={field.id} className="field-row-stacked">
-                <div className="field-row">
-                  <Label htmlFor={`domains.${index}.name`}>Domain Name</Label>
+                <div className="field-row flex-col md:flex-row gap-2">
+                  <Label htmlFor={`domains.${index}.name`} className="min-w-[100px]">Domain Name</Label>
                   <Input
                     {...form.register(`domains.${index}.name`)}
                     placeholder="example.com"
@@ -61,16 +61,16 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
                   />
                 </div>
                 {form.formState.errors.domains?.[index]?.name && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-xs md:text-sm text-red-500">
                     {form.formState.errors.domains[index]?.name?.message}
                   </p>
                 )}
 
-                <div className="field-row">
-                  <Label>Registration Date</Label>
+                <div className="field-row flex-col md:flex-row gap-2">
+                  <Label className="min-w-[100px]">Registration Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button className="button" type="button">
+                      <button className="button w-full md:w-auto" type="button">
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {form.getValues(`domains.${index}.registrationDate`) ? (
                           format(
@@ -98,41 +98,10 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
                       <Calendar
                         mode="single"
                         selected={form.getValues(`domains.${index}.registrationDate`)}
-                        onSelect={(date) => {
-                          if (date) {
-                            handleDateChange(date, index);
-                            form.setValue(`domains.${index}.registrationDate`, date, {
-                              shouldValidate: true,
-                              shouldDirty: true,
-                              shouldTouch: true,
-                            });
-                          }
-                        }}
+                        onSelect={(date) => handleDateChange(date!, index)}
                         initialFocus
                         disabled={(date) => date > new Date()}
                         className="w-full"
-                        classNames={{
-                          months: "flex flex-col space-y-4",
-                          month: "space-y-4",
-                          caption: "flex justify-center pt-1 relative items-center",
-                          caption_label: "text-sm font-bold",
-                          nav: "space-x-1 flex items-center",
-                          nav_button: "button h-7 w-7 bg-transparent p-0",
-                          nav_button_previous: "absolute left-1",
-                          nav_button_next: "absolute right-1",
-                          table: "w-full border-collapse space-y-1",
-                          head_row: "flex",
-                          head_cell: "text-black w-9 font-normal text-[0.8rem]",
-                          row: "flex w-full mt-2",
-                          cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                          day: "button h-8 w-8 p-0 font-normal aria-selected:opacity-100",
-                          day_selected: "bg-[#000080] text-white hover:bg-[#000080] hover:text-white focus:bg-[#000080] focus:text-white",
-                          day_today: "bg-accent text-accent-foreground",
-                          day_outside: "opacity-50",
-                          day_disabled: "opacity-50",
-                          day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                          day_hidden: "invisible",
-                        }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -142,7 +111,7 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
                   <button
                     type="button"
                     onClick={() => remove(index)}
-                    className="button"
+                    className="button w-full md:w-auto"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Remove Domain
@@ -154,25 +123,26 @@ export function ReceiptForm({ onSubmit }: ReceiptFormProps) {
 
           <div className="field-row-stacked">
             <Label htmlFor="twitterHandle">Twitter Handle (optional)</Label>
-            <div className="field-row">
+            <div className="field-row flex-col md:flex-row gap-2">
               <Twitter className="h-5 w-5" />
               <Input
                 {...form.register('twitterHandle')}
                 placeholder="username"
+                className="w-full"
               />
             </div>
           </div>
 
-          <div className="field-row">
+          <div className="field-row flex-col md:flex-row gap-2">
             <button
               type="button"
               onClick={() => append({ name: '', registrationDate: new Date() })}
-              className="button"
+              className="button w-full md:w-auto"
             >
               <Plus className="mr-2 h-4 w-4" />
               Add Another Domain
             </button>
-            <button type="submit" className="button">
+            <button type="submit" className="button w-full md:w-auto">
               Generate Receipt
             </button>
           </div>
